@@ -133,7 +133,7 @@ def StokFrameOluştur(self):
 def filterBoxYap(self):
     self.filterbox = QGroupBox("Filtreler")
     #self.filterbox.setMinimumHeight(100)
-    self.filterbox.filterFields = ('Tip_Kodu','Boyutlar','Stok_Bölgesi',
+    self.filterbox.filterFields = ('Tipi','Tip_Kodu','Boyutlar','Stok_Bölgesi',
                                    'stok_bölgesi_kodu','tip_kodu_adı',
                                    'Firma_Adı','Ad_Soyad')
     self.filterbox.fblo = QGridLayout()

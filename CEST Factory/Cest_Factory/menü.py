@@ -7,6 +7,9 @@ from PyQt5.QtWidgets import QAction
 import sys
 from Cest_Factory.Ekle_Cikar_UI import MalzemeEkleÇıkarDailog,\
                 TicListEkleDialog,TicListSilDialog
+                
+from Cest_Factory.standart_malzemeler_gui import standart_malzemeler_view_edit_gui
+from xlwt.BIFFRecords import BoolErrRecord
 
 class MyClass(object):
     '''
@@ -53,7 +56,15 @@ def menüyap(self):
                     self.statusBar().showMessage('Bu işlem için yetkiniz yok')
                     return
                 #print("TabloListFrame'den seçildi")
-                self.EkleCikardialog = MalzemeEkleÇıkarDailog(self,'ekle')
+                selidxs = self.stokListView.selectionModel().selectedIndexes()
+                row = selidxs[0].row()
+                seçilenListItemName = self.stokListView_Model.tablobilgileri[row][0]
+                if seçilenListItemName =='Standart Malzemeler':
+                    print("Standart malzemeler seçildi")
+                    self.standart_malzeme_gui = standart_malzemeler_view_edit_gui(self)
+                else:
+                    self.EkleCikardialog = MalzemeEkleÇıkarDailog(self,'ekle')
+                    
             elif self.ticlistframe.isVisible():
                 if not 'C' in self.yetki:
                     self.statusBar().showMessage('Bu işlem için yetkiniz yok')
