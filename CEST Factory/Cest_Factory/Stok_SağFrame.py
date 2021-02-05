@@ -61,6 +61,7 @@ def StokFrameOluştur(self):
     def tableviewdan_silactionslot():
         selIdxs = self.tableview.selectionModel().selectedIndexes()
         if not selIdxs:
+            self.kayıtsil_mi.trigger()
             return
         selIdx = selIdxs[0]
         #print(selIdx.row(), selIdx.column())

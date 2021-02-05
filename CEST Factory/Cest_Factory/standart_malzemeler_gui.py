@@ -4,12 +4,12 @@ Created on 30 Oca 2021
 @author: user
 '''
 from PyQt5.QtWidgets import QLabel, QLineEdit, QDialog, QHBoxLayout, QFormLayout,\
-    QPushButton, QVBoxLayout, QApplication, QComboBox
+    QPushButton, QVBoxLayout, QApplication, QComboBox, QMessageBox
 from PyQt5.QtGui import QFont, QPixmap
 import os
 
 
-class standart_malzemeler_view_edit_gui(QDialog):
+class standart_malzemeler_gui(QDialog):
     '''
     classdocs
     '''
@@ -22,14 +22,9 @@ class standart_malzemeler_view_edit_gui(QDialog):
         self.anapencere = anapencere
         #self.rowNo = index.row()
         
-        self.stokBölgesiKoduProper = True
-        self.tipKoduProper = True
-        self.adetproper = False
-        self.tipproper = True
 
         self.bilgileriAl()
-        self.dialogUIoluştur()
-        print("dialog ui sonrası")
+        self.yeni_kayıt_ekle_UI()
         self.dialogMoveCenter()
         self.show()
         
@@ -46,12 +41,20 @@ class standart_malzemeler_view_edit_gui(QDialog):
         msg = self.anapencere.stok_dbm.executeCmd(cmd)
         self.stok_bölgesi_kodlari = [x[0] for x in msg] #Çok Fazla Sayıda İse ??
         
-    def dialogUIoluştur(self):
+#         cmd = "SHOW COLUMNS FROM standart_malzemeler"
+#         msg = self.anapencere.stok_dbm.executeCmd(cmd)
+#         self.colnames = [x[0] for x in msg]
         
-        self.setGeometry(100,100,600,400)
+    def yeni_kayıt_ekle_UI(self):
+        
+        self.setGeometry(100,100,600,300)
         self.setModal(True)
+        self.setWindowTitle("Ekle - Standart Malzemeler")
         
-        self.setWindowTitle("Standart Malzemeler")
+        self.stokBölgesiKoduProper = True
+        self.tipKoduProper = True
+        self.adetproper = False
+        self.tipproper = True
         
         def başlıksection():
             resim = QLabel()
@@ -60,7 +63,7 @@ class standart_malzemeler_view_edit_gui(QDialog):
             pic = QPixmap(path)
             resim.setPixmap(pic)
             
-            self.başlıkLabel = QLabel("Standart Malzemeler")
+            self.başlıkLabel = QLabel("Standart Malzemeler Tablosuna\nEkle")
             self.başlıkLabel.setStyleSheet('color: blue;')
             self.başlıkLabel.setFont(QFont('Arial', 12,QFont.Bold))
             
@@ -84,7 +87,11 @@ class standart_malzemeler_view_edit_gui(QDialog):
                 lambda text: self.TipKoduCheckSlot(text)
                 )
             self.Tip_Kodu.textChanged.connect(self.btnsetEnable)
+            
             self.Boyutlar = QLineEdit()
+            self.Boyutlar.textChanged.connect(
+                lambda text: self.boyutlarslot(text)
+                )
             
             self.Adet = QLineEdit()
             self.Adet.textChanged.connect(
@@ -139,8 +146,21 @@ class standart_malzemeler_view_edit_gui(QDialog):
         self.done(QDialog.Rejected)
     
     def kaydetbtn_call(self):
-        self.done(QDialog.Accepted)
-        
+        matching = self.checkformatchingrecord()
+        if not matching[0]:
+            self.insertnewrecord()
+            self.done(QDialog.Accepted)
+        else:
+            üzerine_ekle = self.üzerine_ekle_msgbox(matching)
+            if üzerine_ekle ==  QMessageBox.Yes:
+                newadet = matching[2] + int(self.Adet.text())
+                record_id = matching[1]
+                self.update_adet_of_record(newadet, record_id)
+                return self.done(QDialog.Accepted)
+            elif üzerine_ekle == QMessageBox.No:
+                return self.done(QDialog.Rejected)
+        return self.done(QDialog.Rejected)
+                
     def dialogMoveCenter(self):
         screenCenter=QApplication.desktop().availableGeometry().center()
         myrect=self.frameGeometry()
@@ -149,25 +169,29 @@ class standart_malzemeler_view_edit_gui(QDialog):
 
     
     def stokBölgesiKoduCheckSlot(self,text):
-            text = text.strip()
-            text = text.upper()
-            if not text:
-                self.msgLabel.setText('')
-                self.stokBölgesiKoduProper = False
+        text = text.strip()
+        text = text.upper()
+        text = text.replace('İ','I')
+        self.Stok_Bölgesi.setText(text)
+        if not text:
+            self.msgLabel.setText('')
+            self.stokBölgesiKoduProper = False
 
-            elif text in self.stok_bölgesi_kodlari:
-                self.msgLabel.setText('')
-                self.stokBölgesiKoduProper = True
-                
-            else:
-                self.msgLabel.setText("'" + text + "'"
-                                       " Stok Bölgesi Kodu Bulunamadı")
-                self.stokBölgesiKoduProper = False
+        elif text in self.stok_bölgesi_kodlari:
+            self.msgLabel.setText('')
+            self.stokBölgesiKoduProper = True
+            
+        else:
+            self.msgLabel.setText("'" + text + "'"
+                                   " Stok Bölgesi Kodu Bulunamadı")
+            self.stokBölgesiKoduProper = False
                 
         
     def TipKoduCheckSlot(self,text):
         text = text.strip()
         text = text.upper()
+        text = text.replace('İ','I')
+        self.Tip_Kodu.setText(text)
         if text and text not in self.tip_kodlari:
             self.msgLabel.setText("'" + text + "'"
                                    " Tip Kodu Bulunamadı")
@@ -202,8 +226,13 @@ class standart_malzemeler_view_edit_gui(QDialog):
             self.msgLabel.setText("")
             self.tipproper = True
             
+    def boyutlarslot(self,text):
+        text = text.strip()
+        text = text.upper()
+        text = text.replace('İ','I')
+        self.Boyutlar.setText(text)
+            
     def btnsetEnable(self):
-        print("btnset enable girişşşşşşşşşşşş")
         if (self.tipKoduProper and
                 self.stokBölgesiKoduProper and
                 self.adetproper and 
@@ -213,8 +242,72 @@ class standart_malzemeler_view_edit_gui(QDialog):
             self.kaydetbtn.setEnabled(True)
         else:
             self.kaydetbtn.setEnabled(False)
+            
+    def checkformatchingrecord(self):
+        #returns (match,matching_id,matching_records_Adet)
         
-
+        cmd = ("SELECT idstandart_malzemeler,Adet " +
+               "FROM standart_malzemeler WHERE " +
+               "Tipi " + self.fieldSQLcondition(self.Tipi.currentText()) + " AND " +
+               "Tip_Kodu " + self.fieldSQLcondition(self.Tip_Kodu.text()) + " AND " +
+               "Boyutlar " + self.fieldSQLcondition(self.Boyutlar.text()) + " AND " +
+               "Stok_Bölgesi " + self.fieldSQLcondition(self.Stok_Bölgesi.text()) + ";"
+               )
+        msg = self.anapencere.stok_dbm.executeCmd(cmd)
+        print(msg)
+        if msg:
+            return (True,msg[0][0],msg[0][1])
+        else:
+            return (False,0,0)
+    
+    def insertnewrecord(self):
+        cmd = ("INSERT INTO standart_malzemeler " +
+               "(Tipi,Tip_Kodu,Boyutlar,Adet,Stok_Bölgesi) " +
+               "VALUES (" + self.fieldSQLtext(self.Tipi.currentText()) + "," +
+               self.fieldSQLtext(self.Tip_Kodu.text()) + "," +
+               self.fieldSQLtext(self.Boyutlar.text()) + "," +
+               self.fieldSQLtext(self.Adet.text()) + "," +
+               self.fieldSQLtext(self.Stok_Bölgesi.text()) + ");"
+               )
+        self.anapencere.stok_dbm.executeCmd(cmd)
+        self.anapencere.tableView_Model.setTable("standart_malzemeler")  # for tableview refresh
+        
+    def update_adet_of_record(self,newadet,record_id):
+        cmd = ("UPDATE standart_malzemeler " +
+               "SET Adet = {} ".format(newadet) +
+               "WHERE idstandart_malzemeler = {}".format(record_id)
+               )
+        print(cmd)
+        self.anapencere.stok_dbm.executeCmd(cmd)
+        self.anapencere.tableView_Model.setTable("standart_malzemeler")  # for tableview refresh
+        self.anapencere.tableView_Model.setYellowRowFromIdColumnValue(record_id)
+        
+    def üzerine_ekle_msgbox(self,matching):
+        msgbox = QMessageBox()
+        msgbox.setIcon(QMessageBox.Question)
+        msgbox.setWindowTitle("Malzeme Bulundu")
+        msgbox.setText(self.Stok_Bölgesi.text() +
+                       " Bölgesinde bu malzemeden " +
+                       str(matching[2]) +
+                       " Adet bulundu")
+        msgbox.setInformativeText("Üzerine " + 
+                               self.Adet.text() +
+                               " Adet eklemek istiyor musunuz?")
+        msgbox.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
+        return msgbox.exec_()
+            
+    def fieldSQLtext(self,text):
+        if text:
+            return "'" + text + "'"
+        else:
+            return 'NULL'
+        
+    def fieldSQLcondition(self,text):
+        if text:
+            return "='" + text + "'"
+        else:
+            return "IS NULL"
+        
     def hellorilerdengel(self):
         print("Ule hellorilerden gelirem uleeeooo")
         print("ule ule uleeeee")

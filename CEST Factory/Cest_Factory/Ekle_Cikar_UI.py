@@ -399,6 +399,7 @@ class MalzemeEkleÇıkarDailog(QDialog):
                 result = result.upper()
                 result = "'" + result + "'"
                 return result
+            #print("convertToSQLValues vals_______________:",vals)
             for i,v in enumerate(vals):
                 #print("self.coltypes[i] :",self.coltypes[i])
                 if self.coltypes[i].startswith('varchar'):
@@ -408,9 +409,9 @@ class MalzemeEkleÇıkarDailog(QDialog):
                     existing_colnames.append(self.colnames[i])
                     #existing_coltypes.append(addDlg.columnTypes[i].decode())
 #             print("<<< vals >>>:",vals)
-            print("/// existing_values \\\:",existing_values) 
+            #print("/// existing_values \\\:",existing_values) 
 #                     #Görüntülemek Önemli !!! yanlış olabilir
-            print("/// existing_colnames \\\:",existing_colnames)
+            #print("/// existing_colnames \\\:",existing_colnames)
 
 
         def insertInto():
@@ -437,9 +438,9 @@ class MalzemeEkleÇıkarDailog(QDialog):
                 else:
                     cond += coln + " = " + vals[i] #existing_values[i]
             cmd += cond
-            print("**** cmd:",cmd)
+            #print("**** cmd:",cmd)
             msg = self.anapencere.stok_dbm.executeCmd(cmd)
-            print("SQL reply:",msg)
+            #print("SQL reply:",msg)
             return msg
         
         def increaseAdetofMatchingRecord(matchingRecord):
@@ -523,7 +524,7 @@ class MalzemeEkleÇıkarDailog(QDialog):
         existing_values = []
         existing_colnames =[]
         convertToSQLValues()
-        print("--- SQL Vals ---:",vals)
+        #print("--- SQL Vals ---:",vals)
         
         if not existing_values:
             return   #----------------- (bi şekilde) hiç değer girilmemişse, çık git

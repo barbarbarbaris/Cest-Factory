@@ -8,8 +8,7 @@ import sys
 from Cest_Factory.Ekle_Cikar_UI import MalzemeEkleÇıkarDailog,\
                 TicListEkleDialog,TicListSilDialog
                 
-from Cest_Factory.standart_malzemeler_gui import standart_malzemeler_view_edit_gui
-from xlwt.BIFFRecords import BoolErrRecord
+from Cest_Factory.standart_malzemeler_gui import standart_malzemeler_gui
 
 class MyClass(object):
     '''
@@ -60,7 +59,7 @@ def menüyap(self):
                 row = selidxs[0].row()
                 seçilenListItemName = self.stokListView_Model.tablobilgileri[row][0]
                 if seçilenListItemName =='Standart Malzemeler':
-                    self.standart_malzeme_gui = standart_malzemeler_view_edit_gui(self)
+                    self.standart_malzeme_gui = standart_malzemeler_gui(self)
                 else:
                     self.EkleCikardialog = MalzemeEkleÇıkarDailog(self,'ekle')
                     
