@@ -443,7 +443,7 @@ class MalzemeEkleÇıkarDailog(QDialog):
             return msg
         
         def increaseAdetofMatchingRecord(matchingRecord):
-            ai = self.colnames.index('Adet') # ai for adet index
+            ai = self.colnames.index('Adet') # arrayindex for adet index
             varolanadet = matchingRecord[ai+1] # +1, id column'u atlamak için..
             print("Adet şu mu:", varolanadet, "   --tipi:",varolanadet.__class__)
             cmd = ("UPDATE {} ".format(self.seçilitablo_dbname) +

@@ -60,7 +60,6 @@ def menüyap(self):
                 row = selidxs[0].row()
                 seçilenListItemName = self.stokListView_Model.tablobilgileri[row][0]
                 if seçilenListItemName =='Standart Malzemeler':
-                    print("Standart malzemeler seçildi")
                     self.standart_malzeme_gui = standart_malzemeler_view_edit_gui(self)
                 else:
                     self.EkleCikardialog = MalzemeEkleÇıkarDailog(self,'ekle')
