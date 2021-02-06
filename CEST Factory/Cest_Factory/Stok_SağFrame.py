@@ -5,7 +5,7 @@ Created on 8 Ara 2020
 '''
 from PyQt5.QtWidgets import QGroupBox, QGridLayout, QTableView, QFrame,\
     QVBoxLayout, QSplitter, QHBoxLayout, QLabel, QLineEdit, QAction,\
-    QAbstractItemView
+    QAbstractItemView, QMenu
 from Cest_Factory.Cest_Factory_classes import barisTableViewModel
 from Cest_Factory.Ekle_Cikar_UI import MalzemeEkleÇıkarDailog,Tableviewdan_sildialog
 from PyQt5.Qt import Qt
@@ -13,6 +13,8 @@ import os
 from PyQt5.QtGui import QIcon
 from Cest_Factory.TicTablesEditGUI import openRelatedDialog
 from Cest_Factory.StokTablesEditGUI import openRelatedDialog2
+from Cest_Factory.standart_malzemeler.üzerine_ekle_çıkar import uzerine_ekle_cikar_gui
+from Cest_Factory.standart_malzemeler.yeni_ekle import yeni_ekle_sil_gui
 
 class MyClass(object):
     '''
@@ -40,46 +42,107 @@ def StokFrameOluştur(self):
     self.tableview.setModel(self.tableView_Model)
     
 #-----------------  Context menü oluştur ---------------------------
-    def tableviewdan_ekleactionslot():
-        selIdxs = self.tableview.selectionModel().selectedIndexes()
-        if not selIdxs:
-            self.yenikayıtekle_mi.trigger()
-            return
-        selIdx = selIdxs[0]
+    def tableviewdan_ekleactionslot_XX():
+        selIdxs = self.tableview.selectionModel().selectedIndexes()        
         if self.stoklistframe.isVisible():
+            if not selIdxs:
+                self.yenikayıtekle_mi.trigger()
+                return
             if not 'B' in self.yetki:
                 self.statusBar().showMessage('Bu işlem için yetkiniz yok')
                 return
-            self.malzemeekleçıkardialog = MalzemeEkleÇıkarDailog(self,'ekle')
-            print(self.tableView_Model.sqldata[selIdx.row()])
-            self.malzemeekleçıkardialog.alanlarıDoldur(
-                self.tableView_Model.sqldata[selIdx.row()][1:])
+            selIdx = selIdxs[0]
+            if self.secilentabloadı == 'standart_malzemeler':
+                self.uzerine_gui = uzerine_ekle_cikar_gui(self,selIdx.row(),'ekle')
+            else:
+                self.malzemeekleçıkardialog = MalzemeEkleÇıkarDailog(self,'ekle')
+                print(self.tableView_Model.sqldata[selIdx.row()])
+                self.malzemeekleçıkardialog.alanlarıDoldur(
+                    self.tableView_Model.sqldata[selIdx.row()][1:])
             #self.tableView_Model.sqldata[self.rowNo][1:]
         elif self.ticlistframe.isVisible():
             self.yenikayıtekle_mi.trigger()
             
-    def tableviewdan_silactionslot():
+    def yeniekle_ctx_slot():
+        self.standart_malzeme_gui = yeni_ekle_sil_gui(self,'ekle')
+        
+    def sil_ctx_slot():
+        self.standart_malzeme_gui = yeni_ekle_sil_gui(self,'sil')
+        
+    def ekle_ctx_slot():
         selIdxs = self.tableview.selectionModel().selectedIndexes()
-        if not selIdxs:
-            self.kayıtsil_mi.trigger()
-            return
         selIdx = selIdxs[0]
-        #print(selIdx.row(), selIdx.column())
+        self.uzerine_gui = uzerine_ekle_cikar_gui(self,selIdx.row(),'ekle')
+        
+    def çıkar_ctx_slot():
+        selIdxs = self.tableview.selectionModel().selectedIndexes()
+        selIdx = selIdxs[0]
+        self.uzerine_gui = uzerine_ekle_cikar_gui(self,selIdx.row(),'çıkar')
+            
+    def tableviewdan_silactionslot_XX():
+        selIdxs = self.tableview.selectionModel().selectedIndexes()
         if self.stoklistframe.isVisible():
+            if not selIdxs:
+                self.kayıtsil_mi.trigger()
+                return
             if not 'B' in self.yetki:
                 self.statusBar().showMessage('Bu işlem için yetkiniz yok')
                 return
-            self.malzemeekleçıkardialog = MalzemeEkleÇıkarDailog(self,'çıkar')
-            print(self.tableView_Model.sqldata[selIdx.row()])
-            self.malzemeekleçıkardialog.alanlarıDoldur(
-                self.tableView_Model.sqldata[selIdx.row()][1:])
-            #self.tableView_Model.sqldata[self.rowNo][1:]
+            selIdx = selIdxs[0]
+            if self.secilentabloadı == 'standart_malzemeler':
+                self.uzerine_gui = uzerine_ekle_cikar_gui(self,selIdx.row(),'çıkar')
+            else:
+                self.malzemeekleçıkardialog = MalzemeEkleÇıkarDailog(self,'çıkar')
+                print(self.tableView_Model.sqldata[selIdx.row()])
+                self.malzemeekleçıkardialog.alanlarıDoldur(
+                    self.tableView_Model.sqldata[selIdx.row()][1:])
         elif self.ticlistframe.isVisible():
             if not 'C' in self.yetki:
                 self.statusBar().showMessage('Bu işlem için yetkiniz yok')
                 return
             #print("Ticlistframe'den seçildi")
             self.tableviewdansil_dialog = Tableviewdan_sildialog(self,selIdx.row())
+            
+    def tableviewdan_silactionslot():
+        selIdxs = self.tableview.selectionModel().selectedIndexes()
+        if self.stoklistframe.isVisible():
+            if not selIdxs:
+                self.kayıtsil_mi.trigger()
+                return
+            if not 'B' in self.yetki:
+                self.statusBar().showMessage('Bu işlem için yetkiniz yok')
+                return
+            selIdx = selIdxs[0]
+            if self.secilentabloadı == 'standart_malzemeler':
+                self.uzerine_gui = uzerine_ekle_cikar_gui(self,selIdx.row(),'çıkar')
+            else:
+                self.malzemeekleçıkardialog = MalzemeEkleÇıkarDailog(self,'çıkar')
+                print(self.tableView_Model.sqldata[selIdx.row()])
+                self.malzemeekleçıkardialog.alanlarıDoldur(
+                    self.tableView_Model.sqldata[selIdx.row()][1:])
+        elif self.ticlistframe.isVisible():
+            if not 'C' in self.yetki:
+                self.statusBar().showMessage('Bu işlem için yetkiniz yok')
+                return
+            #print("Ticlistframe'den seçildi")
+            self.tableviewdansil_dialog = Tableviewdan_sildialog(self,selIdx.row())
+            
+    def table_customContextMenu(position):
+        selIdxs = self.tableview.selectionModel().selectedIndexes()
+        cmenu = QMenu()
+        if self.stoklistframe.isVisible():
+            if not 'B' in self.yetki:
+                return
+            if self.secilentabloadı == 'standart_malzemeler':
+                if selIdxs:
+                    cmenu.addAction(tableview_ekle_ctx_men_it)
+                    cmenu.addAction(tableview_çıkar_ctx_men_it)
+                    cmenu.addSeparator()
+                cmenu.addAction(tableview_yeniekle_ctx_men_it)
+                cmenu.addAction(tableview_sil_ctx_men_it)
+            
+        action = cmenu.exec_(self.tableview.mapToGlobal(position))
+        print(__name__,"action:",action)
             
     def doubleClickedSlot(index):
         if self.ticlistframe.isVisible():
@@ -88,15 +151,24 @@ def StokFrameOluştur(self):
             openRelatedDialog2(self,index)
         
     if any(x in self.yetki for x in ['A','B','C']):
-        tableview_ekle_ctx_men_it=QAction('Kayıt Ekle',self)
-        tableview_ekle_ctx_men_it.triggered.connect(tableviewdan_ekleactionslot)
-        self.tableview.addAction(tableview_ekle_ctx_men_it)
+        
+        tableview_ekle_ctx_men_it = QAction("Bu kayıda ekle")
+        tableview_ekle_ctx_men_it.triggered.connect(ekle_ctx_slot)
+        
+        tableview_çıkar_ctx_men_it = QAction("Bu kayıttan çıkar")
+        tableview_çıkar_ctx_men_it.triggered.connect(çıkar_ctx_slot)
+        
+        tableview_yeniekle_ctx_men_it=QAction('Yeni Kayıt Ekle',self)
+        tableview_yeniekle_ctx_men_it.triggered.connect(yeniekle_ctx_slot)
+        #self.tableview.addAction(tableview_yeniekle_ctx_men_it)
         
         tableview_sil_ctx_men_it=QAction('Kayıt Sil',self)
-        tableview_sil_ctx_men_it.triggered.connect(tableviewdan_silactionslot)
-        self.tableview.addAction(tableview_sil_ctx_men_it)
+        tableview_sil_ctx_men_it.triggered.connect(sil_ctx_slot)
+        #self.tableview.addAction(tableview_sil_ctx_men_it)
         
-        self.tableview.setContextMenuPolicy(Qt.ActionsContextMenu)
+        self.tableview.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.tableview.customContextMenuRequested.connect(table_customContextMenu)
+        
         self.tableview.doubleClicked.connect(doubleClickedSlot)
         
         

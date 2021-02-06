@@ -481,7 +481,7 @@ class MalzemeEkleÇıkarDailog(QDialog):
                 self.anapencere.tableView_Model.setTable(self.seçilitablo_dbname)  # for tableview refresh
                 self.anapencere.tableView_Model.setYellowRowFromIdColumnValue(matchingRecord[0])
             
-        def ekle():            
+        def ekle():
             if self.seçilitablo_dbname in kod_tabloları:
                 insertInto()
             elif self.seçilitablo_dbname in ürün_tabloları:

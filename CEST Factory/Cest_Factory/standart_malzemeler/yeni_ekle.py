@@ -7,26 +7,47 @@ from PyQt5.QtWidgets import QLabel, QLineEdit, QDialog, QHBoxLayout, QFormLayout
     QPushButton, QVBoxLayout, QApplication, QComboBox, QMessageBox
 from PyQt5.QtGui import QFont, QPixmap
 import os
+from Cest_Factory.standart_malzemeler.helper import standart_malzemeler_record
 
 
-class standart_malzemeler_gui(QDialog):
+class yeni_ekle_sil_gui(QDialog):
     '''
     classdocs
     '''
 
-    def __init__(self, anapencere):
+    def __init__(self, anapencere,eklesil):
         '''
         Constructor
         '''
         super().__init__()
         self.anapencere = anapencere
         #self.rowNo = index.row()
+        self.eklesil = eklesil
         
-
+        self.changeTexts()
         self.bilgileriAl()
-        self.yeni_kayıt_ekle_UI()
+        self.UIoluştur()
         self.dialogMoveCenter()
         self.show()
+        
+    def changeTexts(self):
+        
+        if self.eklesil == 'ekle':
+            self.windowtitletext = "Yeni Kayıt Oluştur - Standart Malzemeler"
+            self.başlıkLabeltext = ("Standart Malzemeler Tablosunda\n" +
+                                    "Yeni Kayıt Oluştur")
+            self.başlıkcsstext = 'color: blue;'
+            self.kaydetsilbtntext = "Yeni Kayıt Oluştur"
+            
+        elif self.eklesil == 'sil':
+            self.windowtitletext = "Kayıt Sil - Standart Malzemeler"
+            self.başlıkLabeltext = ("Standart Malzemeler Tablosundan\n" +
+                                    "Kayıt Sil")
+            self.başlıkcsstext = 'color: tomato;'
+            self.kaydetsilbtntext = "Kayıt Sil"
+        else:
+            print(__name__,":Hatalı ekle/sil parametresi girilmiş !!!")
+            return self.done(QDialog.Rejected)
         
     def bilgileriAl(self):
         cmd = "SELECT Tip_Adı FROM malzeme_tipleri"
@@ -45,11 +66,11 @@ class standart_malzemeler_gui(QDialog):
 #         msg = self.anapencere.stok_dbm.executeCmd(cmd)
 #         self.colnames = [x[0] for x in msg]
         
-    def yeni_kayıt_ekle_UI(self):
+    def UIoluştur(self):
         
         self.setGeometry(100,100,600,300)
         self.setModal(True)
-        self.setWindowTitle("Ekle - Standart Malzemeler")
+        self.setWindowTitle(self.windowtitletext)
         
         self.stokBölgesiKoduProper = True
         self.tipKoduProper = True
@@ -63,8 +84,8 @@ class standart_malzemeler_gui(QDialog):
             pic = QPixmap(path)
             resim.setPixmap(pic)
             
-            self.başlıkLabel = QLabel("Standart Malzemeler Tablosuna\nEkle")
-            self.başlıkLabel.setStyleSheet('color: blue;')
+            self.başlıkLabel = QLabel(self.başlıkLabeltext)
+            self.başlıkLabel.setStyleSheet(self.başlıkcsstext)
             self.başlıkLabel.setFont(QFont('Arial', 12,QFont.Bold))
             
             başlıkhbox = QHBoxLayout()
@@ -118,14 +139,14 @@ class standart_malzemeler_gui(QDialog):
             iptalbtn = QPushButton("İptal")
             iptalbtn.setDefault(True)
             iptalbtn.clicked.connect(self.iptalbtn_call)
-            self.kaydetbtn = QPushButton("Kaydet")
-            self.kaydetbtn.clicked.connect(self.kaydetbtn_call)
-            self.kaydetbtn.setEnabled(False)
+            self.kaydetsilbtn = QPushButton(self.kaydetsilbtntext)
+            self.kaydetsilbtn.clicked.connect(self.kaydetbtn_call)
+            self.kaydetsilbtn.setEnabled(False)
             
             section = QHBoxLayout()
             section.addStretch()
             section.addWidget(iptalbtn)
-            section.addWidget(self.kaydetbtn)
+            section.addWidget(self.kaydetsilbtn)
             return section
 
         self.msgLabel = QLabel("")
@@ -146,16 +167,24 @@ class standart_malzemeler_gui(QDialog):
         self.done(QDialog.Rejected)
     
     def kaydetbtn_call(self):
-        matching = self.checkformatchingrecord()
+        new_record = standart_malzemeler_record(self.anapencere,
+                                                Tipi=self.Tipi.currentText(),
+                                                Tip_Kodu=self.Tip_Kodu.text(),
+                                                Boyutlar=self.Boyutlar.text(),
+                                                Stok_Bölgesi=self.Stok_Bölgesi.text(),
+                                                Adet=int(self.Adet.text())
+                                                )
+        matching = new_record.checkformatchingrecord()
         if not matching[0]:
-            self.insertnewrecord()
+            new_record.insertinto_table()
             self.done(QDialog.Accepted)
         else:
             üzerine_ekle = self.üzerine_ekle_msgbox(matching)
             if üzerine_ekle ==  QMessageBox.Yes:
                 newadet = matching[2] + int(self.Adet.text())
-                record_id = matching[1]
-                self.update_adet_of_record(newadet, record_id)
+                print("matching (sql ans)record_id_class:",matching[1].__class__)
+                new_record.record_id = matching[1]
+                new_record.update_adet_of_tablerecord(newadet)
                 return self.done(QDialog.Accepted)
             elif üzerine_ekle == QMessageBox.No:
                 return self.done(QDialog.Rejected)
@@ -239,48 +268,9 @@ class standart_malzemeler_gui(QDialog):
                 self.tipproper and 
                 self.Adet.text()
                 ):
-            self.kaydetbtn.setEnabled(True)
+            self.kaydetsilbtn.setEnabled(True)
         else:
-            self.kaydetbtn.setEnabled(False)
-            
-    def checkformatchingrecord(self):
-        #returns (match,matching_id,matching_records_Adet)
-        
-        cmd = ("SELECT idstandart_malzemeler,Adet " +
-               "FROM standart_malzemeler WHERE " +
-               "Tipi " + self.fieldSQLcondition(self.Tipi.currentText()) + " AND " +
-               "Tip_Kodu " + self.fieldSQLcondition(self.Tip_Kodu.text()) + " AND " +
-               "Boyutlar " + self.fieldSQLcondition(self.Boyutlar.text()) + " AND " +
-               "Stok_Bölgesi " + self.fieldSQLcondition(self.Stok_Bölgesi.text()) + ";"
-               )
-        msg = self.anapencere.stok_dbm.executeCmd(cmd)
-        print(msg)
-        if msg:
-            return (True,msg[0][0],msg[0][1])
-        else:
-            return (False,0,0)
-    
-    def insertnewrecord(self):
-        cmd = ("INSERT INTO standart_malzemeler " +
-               "(Tipi,Tip_Kodu,Boyutlar,Adet,Stok_Bölgesi) " +
-               "VALUES (" + self.fieldSQLtext(self.Tipi.currentText()) + "," +
-               self.fieldSQLtext(self.Tip_Kodu.text()) + "," +
-               self.fieldSQLtext(self.Boyutlar.text()) + "," +
-               self.fieldSQLtext(self.Adet.text()) + "," +
-               self.fieldSQLtext(self.Stok_Bölgesi.text()) + ");"
-               )
-        self.anapencere.stok_dbm.executeCmd(cmd)
-        self.anapencere.tableView_Model.setTable("standart_malzemeler")  # for tableview refresh
-        
-    def update_adet_of_record(self,newadet,record_id):
-        cmd = ("UPDATE standart_malzemeler " +
-               "SET Adet = {} ".format(newadet) +
-               "WHERE idstandart_malzemeler = {}".format(record_id)
-               )
-        print(cmd)
-        self.anapencere.stok_dbm.executeCmd(cmd)
-        self.anapencere.tableView_Model.setTable("standart_malzemeler")  # for tableview refresh
-        self.anapencere.tableView_Model.setYellowRowFromIdColumnValue(record_id)
+            self.kaydetsilbtn.setEnabled(False)
         
     def üzerine_ekle_msgbox(self,matching):
         msgbox = QMessageBox()
@@ -295,20 +285,3 @@ class standart_malzemeler_gui(QDialog):
                                " Adet eklemek istiyor musunuz?")
         msgbox.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
         return msgbox.exec_()
-            
-    def fieldSQLtext(self,text):
-        if text:
-            return "'" + text + "'"
-        else:
-            return 'NULL'
-        
-    def fieldSQLcondition(self,text):
-        if text:
-            return "='" + text + "'"
-        else:
-            return "IS NULL"
-        
-    def hellorilerdengel(self):
-        print("Ule hellorilerden gelirem uleeeooo")
-        print("ule ule uleeeee")
-        print("ulan alla laaaa")

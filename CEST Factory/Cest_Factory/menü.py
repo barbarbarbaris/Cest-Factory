@@ -7,8 +7,8 @@ from PyQt5.QtWidgets import QAction
 import sys
 from Cest_Factory.Ekle_Cikar_UI import MalzemeEkleÇıkarDailog,\
                 TicListEkleDialog,TicListSilDialog
-                
-from Cest_Factory.standart_malzemeler_gui import standart_malzemeler_gui
+from Cest_Factory.standart_malzemeler.yeni_ekle import yeni_ekle_sil_gui
+
 
 class MyClass(object):
     '''
@@ -59,7 +59,7 @@ def menüyap(self):
                 row = selidxs[0].row()
                 seçilenListItemName = self.stokListView_Model.tablobilgileri[row][0]
                 if seçilenListItemName =='Standart Malzemeler':
-                    self.standart_malzeme_gui = standart_malzemeler_gui(self)
+                    self.standart_malzeme_gui = yeni_ekle_sil_gui(self,'ekle')
                 else:
                     self.EkleCikardialog = MalzemeEkleÇıkarDailog(self,'ekle')
                     
@@ -90,7 +90,13 @@ def menüyap(self):
                     self.statusBar().showMessage('Bu işlem için yetkiniz yok')
                     return
                 #print("TabloListFrame'den seçildi")
-                self.EkleCikardialog = MalzemeEkleÇıkarDailog(self,'çıkar')
+                selidxs = self.stokListView.selectionModel().selectedIndexes()
+                row = selidxs[0].row()
+                seçilenListItemName = self.stokListView_Model.tablobilgileri[row][0]
+                if seçilenListItemName =='Standart Malzemeler':
+                    self.standart_malzeme_gui = yeni_ekle_sil_gui(self,'sil')
+                else:
+                    self.EkleCikardialog = MalzemeEkleÇıkarDailog(self,'çıkar')
             elif self.ticlistframe.isVisible():
                 if not 'C' in self.yetki:
                     self.statusBar().showMessage('Bu işlem için yetkiniz yok')

@@ -41,8 +41,8 @@ def listeleriOluştur(self):
         self.statusBar().showMessage('')
         index = selected.indexes()[0]
         #print("QModelIndex.row():",index.row())
-        secilentabloadı = self.gösterilecek_tablo_bilgileri[index.row()][1]
-        self.tableView_Model.setTable(secilentabloadı)
+        self.secilentabloadı = self.gösterilecek_tablo_bilgileri[index.row()][1]
+        self.tableView_Model.setTable(self.secilentabloadı)
         self.tableView_Model.seçimNo = index.row()   # new variable attach
         #self.tableview.itemDelegate().setRow(-1)
         self.tableview.resizeColumnsToContents()
@@ -90,8 +90,8 @@ def listeleriOluştur(self):
         self.statusBar().showMessage('')
         index = selected.indexes()[0]
         #print("QModelIndex.row():",index.row())
-        secilentabloadı = self.gösterilecek_tablo_bilgileri[index.row()][1]
-        self.tableView_Model.setTable(secilentabloadı)
+        self.secilentabloadı = self.gösterilecek_tablo_bilgileri[index.row()][1]
+        self.tableView_Model.setTable(self.secilentabloadı)
         self.tableView_Model.seçimNo = index.row()   # new variable attach
         #self.tableview.itemDelegate().setRow(-1)
         self.tableview.resizeColumnsToContents()
