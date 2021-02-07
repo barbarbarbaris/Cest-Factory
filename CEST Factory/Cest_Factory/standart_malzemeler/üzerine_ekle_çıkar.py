@@ -40,6 +40,7 @@ class uzerine_ekle_cikar_gui(QDialog):
             self.başlıkcsstext = 'color: green;'
             self.ekleçıkaradettext = 'Eklenecek Adet:'
             self.ekleçıkarbtntext = 'Ekle'
+            
         elif self.ekleçıkar == 'çıkar':
             self.windowtitletext = "Çıkar - Standart Malzemeler"
             self.başlıkLabeltext = ("Standart Malzemeler Tablosunda\n" +
@@ -47,6 +48,15 @@ class uzerine_ekle_cikar_gui(QDialog):
             self.başlıkcsstext = 'color: purple;'
             self.ekleçıkaradettext = 'Çıkarılacak Adet:'
             self.ekleçıkarbtntext = 'Çıkar'
+            
+        elif self.ekleçıkar == 'sil':
+            self.windowtitletext = "Kaydı Sil - Standart Malzemeler"
+            self.başlıkLabeltext = ("Standart Malzemeler Tablosunda\n" +
+                                    "Kaydı Sil")
+            self.başlıkcsstext = 'color: tomato;'
+            self.ekleçıkaradettext = 'Sil Adet Kullanılmayacak:'
+            self.ekleçıkarbtntext = 'Kaydı Sil'
+            
         else:
             print(__name__,":Hatalı ekle/çıkar parametresi girilmiş !!!")
             return self.done(QDialog.Rejected)
@@ -113,7 +123,8 @@ class uzerine_ekle_cikar_gui(QDialog):
             section.addRow(QLabel("Malzeme Boyutları:"), self.Boyutlar)
             section.addRow(QLabel("Stok Bölgesi Kodu:"), self.Stok_Bölgesi)
             section.addRow(QLabel("Bulunan Adet:"), self.Adet)
-            section.addRow(QLabel(self.ekleçıkaradettext), self.EkleÇıkarAdet)
+            if self.ekleçıkar in ('ekle','çıkar'):
+                section.addRow(QLabel(self.ekleçıkaradettext), self.EkleÇıkarAdet)
             return section
 
         def buttonsection():
@@ -122,7 +133,8 @@ class uzerine_ekle_cikar_gui(QDialog):
             iptalbtn.clicked.connect(self.iptalbtn_call)
             self.ekleçıkarbtn = QPushButton(self.ekleçıkarbtntext)
             self.ekleçıkarbtn.clicked.connect(self.eklecikarbtn_call)
-            self.ekleçıkarbtn.setEnabled(False)
+            if self.ekleçıkar in ('ekle','çıkar'):
+                self.ekleçıkarbtn.setEnabled(False)
             
             section = QHBoxLayout()
             section.addStretch()
@@ -162,7 +174,10 @@ class uzerine_ekle_cikar_gui(QDialog):
             if newadet<0:
                 self.msgLabel.setText("Çıkarılacak Adet Bulunan Adet'ten Büyük Olamaz !")
                 return
-        self.myrecord.update_adet_of_tablerecord(newadet)
+        if self.ekleçıkar in ('ekle','çıkar'):
+            self.myrecord.update_adet_of_tablerecord(newadet)
+        elif self.ekleçıkar == 'sil':
+            self.myrecord.delete_tablerecord()
         return self.done(QDialog.Accepted)
                 
     def dialogMoveCenter(self):

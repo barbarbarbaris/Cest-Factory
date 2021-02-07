@@ -63,6 +63,12 @@ class standart_malzemeler_record():
         self.anapencere.tableView_Model.setTable("standart_malzemeler")  # for tableview refresh
         self.anapencere.tableView_Model.setYellowRowFromIdColumnValue(self.record_id)
         
+    def delete_tablerecord(self):
+        cmd = ("DELETE FROM standart_malzemeler "+
+               "WHERE idstandart_malzemeler = {}".format(self.record_id))
+        self.anapencere.stok_dbm.executeCmd(cmd)
+        self.anapencere.tableView_Model.setTable("standart_malzemeler")  # for tableview refresh
+        
     def setfromtablerowdata(self,rowdata):
         if len(rowdata)<6:
             print(__name__," Eksik table rowdata girişi")
