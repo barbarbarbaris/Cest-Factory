@@ -3,7 +3,8 @@ Created on 7 Şub 2021
 
 @author: user
 '''
-from Cest_Factory.standart_malzemeler.helper import fieldSQLcondition,fieldSQLtext
+from Cest_Factory.standart_malzemeler.helper import fieldSQLcondition,fieldSQLtext,\
+    translatefromSQLans
 
 class tipler_kodlar_record():
     '''
@@ -60,3 +61,11 @@ class tipler_kodlar_record():
         print("-------- cmd:",cmd)
         self.anapencere.stok_dbm.executeCmd(cmd)
         self.anapencere.tableView_Model.setTable(self.dialog.seçilitablo_dbname)  # for tableview refresh
+
+    def setfromtablerowdata(self,rowdata):
+        if len(rowdata)<3:
+            print(__name__," Eksik table rowdata girişi")
+            return
+        self.record_id = rowdata[0] # None olamaz, Not Null(NN) özellikli SQL Alanıdır bu.
+        self.field1 = translatefromSQLans(rowdata[1])
+        self.field2 = translatefromSQLans(rowdata[2])

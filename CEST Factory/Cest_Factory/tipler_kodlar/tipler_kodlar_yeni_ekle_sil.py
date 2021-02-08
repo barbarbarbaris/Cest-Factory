@@ -15,18 +15,21 @@ class tipler_kodlar_yeni_ekle_sil_gui(QDialog):
     '''
 
 
-    def __init__(self, anapencere, eklesil):
+    def __init__(self, anapencere, eklesil,*,rowNo=0):
         '''
         Constructor
         '''
         super().__init__()
         self.anapencere = anapencere
         self.eklesil = eklesil
+        self.rowNo = rowNo
         
         self.gerekliBilgileriAl()
         self.changeTexts()
         self.UIoluştur()
         self.dialogMoveCenter()
+        self.setStyleSheet("QLabel[field=true] {font-weight: bold; " + 
+                           self.başlıkcsstext + " }")
         self.show()
     
     def gerekliBilgileriAl(self):
@@ -42,6 +45,12 @@ class tipler_kodlar_yeni_ekle_sil_gui(QDialog):
         cmd = "SELECT {} FROM {}".format(self.colnames[1][0],self.seçilitablo_dbname)
         msg = self.anapencere.stok_dbm.executeCmd(cmd)
         self.field1recordsintable = [x[0] for x in msg] #Çok Fazla Sayıda İse ??
+        
+        if self.eklesil == 'kaydısil':
+            rowdata = self.anapencere.tableView_Model.sqldata[self.rowNo]
+            #print("Alınan satır bilgisi:",rowdata)
+            self.myrecord = tipler_kodlar_record(self.anapencere,self)
+            self.myrecord.setfromtablerowdata(rowdata)
         
     def changeTexts(self):
         
@@ -59,6 +68,13 @@ class tipler_kodlar_yeni_ekle_sil_gui(QDialog):
                                     "Kayıt Sil")
             self.başlıkcsstext = 'color: tomato;'
             self.yenieklesilbtntext = "Kayıt Sil"
+        elif self.eklesil == 'kaydısil':
+            self.windowtitletext = 'Kaydı Sil - ' + self.seçilitablo_showname
+            self.başlıkLabeltext = (self.seçilitablo_showname + 
+                                    " Tablosundan\n" +
+                                    "Kayıt Sil")
+            self.başlıkcsstext = 'color: tomato;'
+            self.yenieklesilbtntext = "Kaydı Sil"
         else:
             print(__name__,":Hatalı ekle/sil parametresi girilmiş !!!")
             return self.done(QDialog.Rejected)
@@ -98,26 +114,22 @@ class tipler_kodlar_yeni_ekle_sil_gui(QDialog):
             self.le1.textChanged.connect(self.btnsetEnable)
 #             
             self.le2 = QLineEdit()
-#             self.Boyutlar.textChanged.connect(
-#                 lambda text: self.boyutlarslot(text)
-#                 )
-#             
-#             self.Adet = QLineEdit()
-#             self.Adet.textChanged.connect(
-#                 lambda text: self.AdetCheckSlot(text)
-#                 )
-#             self.Adet.textChanged.connect(self.btnsetEnable)
-#             
-#             self.Stok_Bölgesi = QLineEdit()
-#             self.Stok_Bölgesi.textChanged.connect(
-#                 lambda text: self.stokBölgesiKoduCheckSlot(text)
-#                 )
-#             self.Stok_Bölgesi.textChanged.connect(self.btnsetEnable)
+            
                 
             section = QFormLayout()
-            section.addRow(QLabel(self.colnames[1][0]+":"), self.le1)
+            
             if self.eklesil == 'ekle':
+                section.addRow(QLabel(self.colnames[1][0]+":"), self.le1)
                 section.addRow(QLabel(self.colnames[2][0]+":"), self.le2)
+            elif self.eklesil == 'sil':
+                section.addRow(QLabel(self.colnames[1][0]+":"), self.le1)
+            elif self.eklesil == 'kaydısil':
+                self.field1Label = QLabel(self.myrecord.field1)
+                self.field1Label.setProperty("field", True)
+                self.field2Label = QLabel(self.myrecord.field2)
+                self.field2Label.setProperty("field", True)
+                section.addRow(QLabel(self.colnames[1][0]+":"), self.field1Label)
+                section.addRow(QLabel(self.colnames[2][0]+":"), self.field2Label)
             return section
         
         def buttonsection():
@@ -126,7 +138,10 @@ class tipler_kodlar_yeni_ekle_sil_gui(QDialog):
             iptalbtn.clicked.connect(self.iptalbtn_call)
             self.yenieklesilbtn = QPushButton(self.yenieklesilbtntext)
             self.yenieklesilbtn.clicked.connect(self.yenieklesilbtn_call)
-            self.yenieklesilbtn.setEnabled(False)
+            if self.eklesil in ('ekle','sil'):
+                self.yenieklesilbtn.setEnabled(False)
+            elif self.eklesil == 'kaydısil':
+                self.yenieklesilbtn.setEnabled(True)
             
             section = QHBoxLayout()
             section.addStretch()
@@ -169,13 +184,12 @@ class tipler_kodlar_yeni_ekle_sil_gui(QDialog):
             else:
                 self.error_msgbox("Kayıt Bulundu. Bu bir hatadır.")
                 return self.done(QDialog.Rejected)
-        if self.eklesil == 'sil':
-            self.myrecord = tipler_kodlar_record(self.anapencere, self,
-                                                 field1 = self.le1.text()
-                                                 )
-            print("----------- before checkformatchingrecord")
+        if self.eklesil in ('sil','kaydısil'):
+            if self.eklesil == 'sil':
+                self.myrecord = tipler_kodlar_record(self.anapencere, self,
+                                                     field1 = self.le1.text()
+                                                     )
             matching = self.myrecord.checkformatchingrecord()
-            print("----------- after checkformatchingrecord")
             if matching[0]:
                 self.myrecord.record_id = matching[1]
                 self.myrecord.deletefromtable()

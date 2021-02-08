@@ -69,7 +69,9 @@ def StokFrameOluştur(self):
         self.tipkod_yenieklesilgui = tipler_kodlar_yeni_ekle_sil_gui(self,'sil')
     
     def tipkod_kaydısil_ctx_slot():
-        pass
+        selIdxs = self.tableview.selectionModel().selectedIndexes()
+        selIdx = selIdxs[0]
+        self.uzerine_gui = tipler_kodlar_yeni_ekle_sil_gui(self,'kaydısil',rowNo=selIdx.row())
             
     def table_customContextMenu(position):
         selIdxs = self.tableview.selectionModel().selectedIndexes()
@@ -87,7 +89,7 @@ def StokFrameOluştur(self):
                 cmenu.addAction(tableview_sil_ctx_men_it)
             elif self.secilentabloadı in ('malzeme_tipleri','tip_kodlari',
                                           'stok_bölgesi_kodlari'):
-                if not 'B' in self.yetki:
+                if not 'B' in self.yetki: # YETKİ DEĞİŞTİRMEYİ DÜŞÜN (D EKLE MESELA)
                     return
                 if selIdxs:
                     cmenu.addAction(tipkod_kaydısil_ctx)
