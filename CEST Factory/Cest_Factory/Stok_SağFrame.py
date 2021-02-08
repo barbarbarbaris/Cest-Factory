@@ -4,7 +4,7 @@ Created on 8 Ara 2020
 @author: user
 '''
 from PyQt5.QtWidgets import QGroupBox, QGridLayout, QTableView, QFrame,\
-    QVBoxLayout, QSplitter, QHBoxLayout, QLabel, QLineEdit, QAction,\
+    QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, QAction,\
     QAbstractItemView, QMenu
 from Cest_Factory.Cest_Factory_classes import barisTableViewModel
 from Cest_Factory.Ekle_Cikar_UI import MalzemeEkleÇıkarDailog,Tableviewdan_sildialog
@@ -15,6 +15,7 @@ from Cest_Factory.TicTablesEditGUI import openRelatedDialog
 from Cest_Factory.StokTablesEditGUI import openRelatedDialog2
 from Cest_Factory.standart_malzemeler.üzerine_ekle_çıkar import uzerine_ekle_cikar_gui
 from Cest_Factory.standart_malzemeler.yeni_ekle import yeni_ekle_sil_gui
+from Cest_Factory.tipler_kodlar.tipler_kodlar_yeni_ekle_sil import tipler_kodlar_yeni_ekle_sil_gui
 
 class MyClass(object):
     '''
@@ -60,15 +61,23 @@ def StokFrameOluştur(self):
         selIdxs = self.tableview.selectionModel().selectedIndexes()
         selIdx = selIdxs[0]
         self.uzerine_gui = uzerine_ekle_cikar_gui(self,selIdx.row(),'sil')
-
+        
+    def tipkod_yeniekle_ctx_slot():
+        self.tipkod_yenieklesilgui = tipler_kodlar_yeni_ekle_sil_gui(self,'ekle')
+        
+    def tipkod_sil_ctx_slot():
+        self.tipkod_yenieklesilgui = tipler_kodlar_yeni_ekle_sil_gui(self,'sil')
+    
+    def tipkod_kaydısil_ctx_slot():
+        pass
             
     def table_customContextMenu(position):
         selIdxs = self.tableview.selectionModel().selectedIndexes()
         cmenu = QMenu()
         if self.stoklistframe.isVisible():
-            if not 'B' in self.yetki:
-                return
             if self.secilentabloadı == 'standart_malzemeler':
+                if not 'B' in self.yetki:
+                    return
                 if selIdxs:
                     cmenu.addAction(tableview_ekle_ctx_men_it)
                     cmenu.addAction(tableview_çıkar_ctx_men_it)
@@ -76,9 +85,18 @@ def StokFrameOluştur(self):
                     cmenu.addSeparator()
                 cmenu.addAction(tableview_yeniekle_ctx_men_it)
                 cmenu.addAction(tableview_sil_ctx_men_it)
+            elif self.secilentabloadı in ('malzeme_tipleri','tip_kodlari',
+                                          'stok_bölgesi_kodlari'):
+                if not 'B' in self.yetki:
+                    return
+                if selIdxs:
+                    cmenu.addAction(tipkod_kaydısil_ctx)
+                    cmenu.addSeparator()
+                cmenu.addAction(tipkod_yeniekle_ctx)
+                cmenu.addAction(tipkod_sil_ctx)
             
         action = cmenu.exec_(self.tableview.mapToGlobal(position))
-        print(__name__,"action:",action)
+        #print(__name__,"action:",action)
             
     def doubleClickedSlot(index):
         if self.ticlistframe.isVisible():
@@ -102,6 +120,15 @@ def StokFrameOluştur(self):
         
         tableview_sil_ctx_men_it=QAction('Kayıt Sil',self)
         tableview_sil_ctx_men_it.triggered.connect(sil_ctx_slot)
+        
+        tipkod_yeniekle_ctx = QAction('Yeni Kayıt Ekle',self)
+        tipkod_yeniekle_ctx.triggered.connect(tipkod_yeniekle_ctx_slot)
+        
+        tipkod_kaydısil_ctx = QAction('Bu Kaydı Sil',self)
+        tipkod_kaydısil_ctx.triggered.connect(tipkod_kaydısil_ctx_slot)
+        
+        tipkod_sil_ctx = QAction('Kayıt Sil',self)
+        tipkod_sil_ctx.triggered.connect(tipkod_sil_ctx_slot)
         
         self.tableview.setContextMenuPolicy(Qt.CustomContextMenu)
         self.tableview.customContextMenuRequested.connect(table_customContextMenu)

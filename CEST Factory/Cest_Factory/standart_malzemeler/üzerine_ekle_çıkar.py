@@ -63,7 +63,7 @@ class uzerine_ekle_cikar_gui(QDialog):
         
     def bilgileriAl(self):
         rowdata = self.anapencere.tableView_Model.sqldata[self.rowNo]
-        print("Alınan satır bilgisi:",rowdata)
+        #print("Alınan satır bilgisi:",rowdata)
         self.myrecord = standart_malzemeler_record(self.anapencere)
         self.myrecord.setfromtablerowdata(rowdata)
         
@@ -210,7 +210,7 @@ class uzerine_ekle_cikar_gui(QDialog):
     def error_msgbox(self,errortext):
         msgbox = QMessageBox() 
         msgbox.setIcon(QMessageBox.Critical)
-        msgbox.setWindowTitle("Kayıt Bulunamadı")
+        msgbox.setWindowTitle("Hata")
         msgbox.setText(errortext)
         msgbox.setInformativeText("Durumu Barış Kılıçlar'a bildiriniz. "
                                   "Tel: 0532 224 07 31")

@@ -130,7 +130,8 @@ class yeni_ekle_sil_gui(QDialog):
             section.addRow(QLabel("Malzeme Tipi:"), self.Tipi)
             section.addRow(QLabel("Malzeme Tip Kodu:"), self.Tip_Kodu)
             section.addRow(QLabel("Malzeme Boyutları:"), self.Boyutlar)
-            section.addRow(QLabel("Adet:"), self.Adet)
+            if self.eklesil == 'ekle':
+                section.addRow(QLabel("Adet:"), self.Adet)
             section.addRow(QLabel("Stok Bölgesi Kodu:"), self.Stok_Bölgesi)
             return section
 
@@ -141,7 +142,11 @@ class yeni_ekle_sil_gui(QDialog):
             iptalbtn.clicked.connect(self.iptalbtn_call)
             self.kaydetsilbtn = QPushButton(self.kaydetsilbtntext)
             self.kaydetsilbtn.clicked.connect(self.kaydetbtn_call)
-            self.kaydetsilbtn.setEnabled(False)
+            
+            if self.eklesil == 'ekle':
+                self.kaydetsilbtn.setEnabled(False)
+            elif self.eklesil == 'sil':
+                self.kaydetsilbtn.setEnabled(True)
             
             section = QHBoxLayout()
             section.addStretch()
@@ -167,28 +172,45 @@ class yeni_ekle_sil_gui(QDialog):
         self.done(QDialog.Rejected)
     
     def kaydetbtn_call(self):
-        new_record = standart_malzemeler_record(self.anapencere,
-                                                Tipi=self.Tipi.currentText(),
-                                                Tip_Kodu=self.Tip_Kodu.text(),
-                                                Boyutlar=self.Boyutlar.text(),
-                                                Stok_Bölgesi=self.Stok_Bölgesi.text(),
-                                                Adet=int(self.Adet.text())
-                                                )
-        matching = new_record.checkformatchingrecord()
-        if not matching[0]:
-            new_record.insertinto_table()
-            self.done(QDialog.Accepted)
-        else:
-            üzerine_ekle = self.üzerine_ekle_msgbox(matching)
-            if üzerine_ekle ==  QMessageBox.Yes:
-                newadet = matching[2] + int(self.Adet.text())
-                print("matching (sql ans)record_id_class:",matching[1].__class__)
-                new_record.record_id = matching[1]
-                new_record.update_adet_of_tablerecord(newadet)
-                return self.done(QDialog.Accepted)
-            elif üzerine_ekle == QMessageBox.No:
-                return self.done(QDialog.Rejected)
-        return self.done(QDialog.Rejected)
+        if self.eklesil == 'ekle':
+            new_record = standart_malzemeler_record(self.anapencere,
+                                                    Tipi=self.Tipi.currentText(),
+                                                    Tip_Kodu=self.Tip_Kodu.text(),
+                                                    Boyutlar=self.Boyutlar.text(),
+                                                    Stok_Bölgesi=self.Stok_Bölgesi.text(),
+                                                    Adet=int(self.Adet.text())
+                                                    )
+            matching = new_record.checkformatchingrecord()
+            if not matching[0]:
+                new_record.insertinto_table()
+                self.done(QDialog.Accepted)
+            else:
+                üzerine_ekle = self.üzerine_ekle_msgbox(matching)
+                if üzerine_ekle ==  QMessageBox.Yes:
+                    newadet = matching[2] + int(self.Adet.text())
+                    #print("matching (sql ans)record_id_class:",matching[1].__class__)
+                    new_record.record_id = matching[1]
+                    new_record.update_adet_of_tablerecord(newadet)
+                    return self.done(QDialog.Accepted)
+                elif üzerine_ekle == QMessageBox.No:
+                    return self.done(QDialog.Rejected)
+        elif self.eklesil == 'sil':
+            new_record = standart_malzemeler_record(self.anapencere,
+                                                    Tipi=self.Tipi.currentText(),
+                                                    Tip_Kodu=self.Tip_Kodu.text(),
+                                                    Boyutlar=self.Boyutlar.text(),
+                                                    Stok_Bölgesi=self.Stok_Bölgesi.text()
+                                                    )
+            matching = new_record.checkformatchingrecord()
+            if not matching[0]:
+                self.sil_bulunamadı_msgbox()
+            else:
+                answer = self.sil_uyarı_msgbox(matching)
+                if answer == QMessageBox.Yes:
+                    new_record.record_id = matching[1]
+                    new_record.delete_tablerecord()
+                    self.done(QDialog.Accepted)
+#         return self.done(QDialog.Rejected)
                 
     def dialogMoveCenter(self):
         screenCenter=QApplication.desktop().availableGeometry().center()
@@ -204,7 +226,7 @@ class yeni_ekle_sil_gui(QDialog):
         self.Stok_Bölgesi.setText(text)
         if not text:
             self.msgLabel.setText('')
-            self.stokBölgesiKoduProper = False
+            self.stokBölgesiKoduProper = True
 
         elif text in self.stok_bölgesi_kodlari:
             self.msgLabel.setText('')
@@ -262,12 +284,12 @@ class yeni_ekle_sil_gui(QDialog):
         self.Boyutlar.setText(text)
             
     def btnsetEnable(self):
-        if (self.tipKoduProper and
-                self.stokBölgesiKoduProper and
-                self.adetproper and 
-                self.tipproper and 
-                self.Adet.text()
-                ):
+        condition = (self.tipKoduProper and
+                     self.stokBölgesiKoduProper and
+                     self.tipproper)
+        if self.eklesil == 'ekle':
+            condition = condition and self.adetproper and self.Adet.text()
+        if condition:
             self.kaydetsilbtn.setEnabled(True)
         else:
             self.kaydetsilbtn.setEnabled(False)
@@ -283,5 +305,29 @@ class yeni_ekle_sil_gui(QDialog):
         msgbox.setInformativeText("Üzerine " + 
                                self.Adet.text() +
                                " Adet eklemek istiyor musunuz?")
+        msgbox.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
+        return msgbox.exec_()
+    
+    def sil_bulunamadı_msgbox(self):
+        msgbox = QMessageBox()
+        msgbox.setIcon(QMessageBox.Critical)
+        msgbox.setWindowTitle("Malzeme Bulunamadı")
+        msgbox.setText(self.Stok_Bölgesi.text() +
+                       " Bölgesinde Bu Özelliklerde " +
+                       self.Tipi.currentText() + " Bulunamadı")
+#         msgbox.setInformativeText("Bu bir hatadır. Barış Kılıçlar'ı arayınız." +
+#                                   "Tel:0532 224 07 31")
+        msgbox.setStandardButtons(QMessageBox.Ok)
+        return msgbox.exec_()
+    
+    def sil_uyarı_msgbox(self,matching):
+        msgbox = QMessageBox()
+        msgbox.setIcon(QMessageBox.Question)
+        msgbox.setWindowTitle("Siliniyor")
+        msgbox.setText(self.Stok_Bölgesi.text() +
+                       " Bölgesinde Bu Özelliklerde " +
+                       str(matching[2]) + " Adet " +
+                       self.Tipi.currentText() + " Bulundu")
+        msgbox.setInformativeText("Bu kaydı tamamen silmek istiyor musunuz?")
         msgbox.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
         return msgbox.exec_()

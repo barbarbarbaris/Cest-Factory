@@ -8,6 +8,7 @@ import sys
 from Cest_Factory.Ekle_Cikar_UI import MalzemeEkleÇıkarDailog,\
                 TicListEkleDialog,TicListSilDialog
 from Cest_Factory.standart_malzemeler.yeni_ekle import yeni_ekle_sil_gui
+from Cest_Factory.tipler_kodlar.tipler_kodlar_yeni_ekle_sil import tipler_kodlar_yeni_ekle_sil_gui
 
 
 class MyClass(object):
@@ -55,11 +56,18 @@ def menüyap(self):
                     self.statusBar().showMessage('Bu işlem için yetkiniz yok')
                     return
                 #print("TabloListFrame'den seçildi")
-                selidxs = self.stokListView.selectionModel().selectedIndexes()
-                row = selidxs[0].row()
-                seçilenListItemName = self.stokListView_Model.tablobilgileri[row][0]
-                if seçilenListItemName =='Standart Malzemeler':
+#                 selidxs = self.stokListView.selectionModel().selectedIndexes()
+#                 if not selidxs:# type(model).__name__=='QSqlTableModel':
+#                     #print("Tablo yooook")
+#                     self.statusBar().showMessage('Tablo Seçilmedi')
+#                     return
+#                 row = selidxs[0].row()
+#                 seçilenListItemName = self.stokListView_Model.tablobilgileri[row][0]
+                if self.secilentabloadı =='standart_malzemeler':
                     self.standart_malzeme_gui = yeni_ekle_sil_gui(self,'ekle')
+                elif self.secilentabloadı in ('malzeme_tipleri','tip_kodlari',
+                                              'stok_bölgesi_kodlari'):
+                    self.tipler_kodlar_gui = tipler_kodlar_yeni_ekle_sil_gui(self,'ekle')
                 else:
                     self.EkleCikardialog = MalzemeEkleÇıkarDailog(self,'ekle')
                     
@@ -90,11 +98,15 @@ def menüyap(self):
                     self.statusBar().showMessage('Bu işlem için yetkiniz yok')
                     return
                 #print("TabloListFrame'den seçildi")
-                selidxs = self.stokListView.selectionModel().selectedIndexes()
-                row = selidxs[0].row()
-                seçilenListItemName = self.stokListView_Model.tablobilgileri[row][0]
-                if seçilenListItemName =='Standart Malzemeler':
+#                 selidxs = self.stokListView.selectionModel().selectedIndexes()
+#                 row = selidxs[0].row()
+#                 seçilenListItemName = self.stokListView_Model.tablobilgileri[row][0]
+
+                if self.secilentabloadı =='standart_malzemeler':
                     self.standart_malzeme_gui = yeni_ekle_sil_gui(self,'sil')
+                elif self.secilentabloadı in ('malzeme_tipleri','tip_kodlari',
+                                              'stok_bölgesi_kodlari'):
+                    self.tipler_kodlar_gui = tipler_kodlar_yeni_ekle_sil_gui(self,'sil')
                 else:
                     self.EkleCikardialog = MalzemeEkleÇıkarDailog(self,'çıkar')
             elif self.ticlistframe.isVisible():
