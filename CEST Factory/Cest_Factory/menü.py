@@ -9,6 +9,8 @@ from Cest_Factory.Ekle_Cikar_UI import MalzemeEkleÇıkarDailog,\
                 TicListEkleDialog,TicListSilDialog
 from Cest_Factory.standart_malzemeler.yeni_ekle import yeni_ekle_sil_gui
 from Cest_Factory.tipler_kodlar.tipler_kodlar_yeni_ekle_sil import tipler_kodlar_yeni_ekle_sil_gui
+from Cest_Factory.tabloaktar import civataları_aktar, alyanları_aktar,\
+    havşaları_aktar, setiskurları_aktar, somunları_aktar, rulmanları_aktar
 
 
 class MyClass(object):
@@ -132,3 +134,27 @@ def menüyap(self):
         self.kayıtsil_mi.triggered.connect(sil_menuaction)
         menu_düzenle.addAction(self.kayıtsil_mi)
         
+    if 'A' in self.yetki:
+        civatalaraktar=QAction('Civatalar Aktar',self)
+        civatalaraktar.triggered.connect(lambda : civataları_aktar(self,menu_araçlar,civatalaraktar))
+        menu_araçlar.addAction(civatalaraktar)
+        
+        alyanlaraktar=QAction('Alyan Civatalar Aktar',self)
+        alyanlaraktar.triggered.connect(lambda : alyanları_aktar(self,menu_araçlar,alyanlaraktar))
+        menu_araçlar.addAction(alyanlaraktar)
+        
+        havşalaraktar=QAction('Havşa Civatalar Aktar',self)
+        havşalaraktar.triggered.connect(lambda : havşaları_aktar(self,menu_araçlar,havşalaraktar))
+        menu_araçlar.addAction(havşalaraktar)
+        
+        setiskuraktar=QAction('setiskurları Aktar',self)
+        setiskuraktar.triggered.connect(lambda : setiskurları_aktar(self,menu_araçlar,setiskuraktar))
+        menu_araçlar.addAction(setiskuraktar)
+        
+        somunlaraktar=QAction('somunları Aktar',self)
+        somunlaraktar.triggered.connect(lambda : somunları_aktar(self,menu_araçlar,somunlaraktar))
+        menu_araçlar.addAction(somunlaraktar)
+        
+        rulmanlarıaktar=QAction('rulmanları Aktar',self)
+        rulmanlarıaktar.triggered.connect(lambda : rulmanları_aktar(self,menu_araçlar,rulmanlarıaktar))
+        menu_araçlar.addAction(rulmanlarıaktar)
