@@ -11,6 +11,7 @@ from Cest_Factory.standart_malzemeler.yeni_ekle import yeni_ekle_sil_gui
 from Cest_Factory.tipler_kodlar.tipler_kodlar_yeni_ekle_sil import tipler_kodlar_yeni_ekle_sil_gui
 from Cest_Factory.tabloaktar import civataları_aktar, alyanları_aktar,\
     havşaları_aktar, setiskurları_aktar, somunları_aktar, rulmanları_aktar
+from Cest_Factory.cest_kodları.cest_yeniekle_sil import cest_yenieklesil_gui
 
 
 class MyClass(object):
@@ -70,6 +71,8 @@ def menüyap(self):
                 elif self.secilentabloadı in ('malzeme_tipleri','tip_kodlari',
                                               'stok_bölgesi_kodlari'):
                     self.tipler_kodlar_gui = tipler_kodlar_yeni_ekle_sil_gui(self,'ekle')
+                elif self.secilentabloadı == 'cest_stok_kodları':
+                    self.tipler_kodlar_gui = cest_yenieklesil_gui(self,'ekle')
                 else:
                     self.EkleCikardialog = MalzemeEkleÇıkarDailog(self,'ekle')
                     
@@ -109,6 +112,8 @@ def menüyap(self):
                 elif self.secilentabloadı in ('malzeme_tipleri','tip_kodlari',
                                               'stok_bölgesi_kodlari'):
                     self.tipler_kodlar_gui = tipler_kodlar_yeni_ekle_sil_gui(self,'sil')
+                elif self.secilentabloadı == 'cest_stok_kodları':
+                    self.tipler_kodlar_gui = cest_yenieklesil_gui(self,'sil')
                 else:
                     self.EkleCikardialog = MalzemeEkleÇıkarDailog(self,'çıkar')
             elif self.ticlistframe.isVisible():

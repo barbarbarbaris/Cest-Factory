@@ -45,6 +45,7 @@ def standartmalzemeleretabloaktar(self,tablename,idcolname,Tipi):
         standartmalzemerecord.insertinto_table()
         deletefromtablebyid(self,tablename,idcolname,msg[0][0])
         print(tablename,"tablosundan aktarılan kayıtno:",i+1)
+    print(i+1,"Adet",Tipi,"aktarıldı...")
     return i==tablelength-1
 
 def civataları_aktar(self,menu,action):

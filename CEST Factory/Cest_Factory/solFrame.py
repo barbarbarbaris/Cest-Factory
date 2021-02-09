@@ -31,7 +31,7 @@ def listeleriOluştur(self):
     self.stokListView.setModel(self.stokListView_Model)
     self.stokListView.setSelectionBehavior(QAbstractItemView.SelectRows)
     self.stokListView.setEditTriggers(QAbstractItemView.NoEditTriggers)
-    self.stokListView.setIconSize(QSize(50, 50))    
+    self.stokListView.setIconSize(QSize(50, 50))
 #     butindex = self.stokListView_Model.createIndex(1,2)
 #     listwbut = QPushButton("halo")
 #     self.stokListView.setIndexWidget(butindex, listwbut)
@@ -56,11 +56,15 @@ def listeleriOluştur(self):
     #print(msg)
 
     self.stokListView_Model.tablobilgileri = msg
+    rowsize = QSize()
+    #rowsize.setWidth(50)
+    rowsize.setHeight(50)
     for tablodegerleri in self.stokListView_Model.tablobilgileri:
         #print("Val:",text)
         item = QStandardItem(tablodegerleri[0])
         path = os.path.join('images', tablodegerleri[2])
         item.setData(QIcon(path),Qt.DecorationRole)
+        item.setData(rowsize,Qt.SizeHintRole)
         self.stokListView_Model.appendRow(item)
         
 #-----------------  Context menü oluştur ---------------------------

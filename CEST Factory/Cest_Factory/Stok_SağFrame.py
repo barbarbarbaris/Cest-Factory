@@ -16,6 +16,7 @@ from Cest_Factory.StokTablesEditGUI import openRelatedDialog2
 from Cest_Factory.standart_malzemeler.üzerine_ekle_çıkar import uzerine_ekle_cikar_gui
 from Cest_Factory.standart_malzemeler.yeni_ekle import yeni_ekle_sil_gui
 from Cest_Factory.tipler_kodlar.tipler_kodlar_yeni_ekle_sil import tipler_kodlar_yeni_ekle_sil_gui
+from Cest_Factory.cest_kodları.cest_yeniekle_sil import cest_yenieklesil_gui
 
 class MyClass(object):
     '''
@@ -72,6 +73,17 @@ def StokFrameOluştur(self):
         selIdxs = self.tableview.selectionModel().selectedIndexes()
         selIdx = selIdxs[0]
         self.uzerine_gui = tipler_kodlar_yeni_ekle_sil_gui(self,'kaydısil',rowNo=selIdx.row())
+        
+    def cestkod_yeniekle_ctx_slot():
+        self.tipkod_yenieklesilgui = cest_yenieklesil_gui(self,'ekle')
+        
+    def cestkod_sil_ctx_slot():
+        self.tipkod_yenieklesilgui = cest_yenieklesil_gui(self,'sil')
+        
+    def cestkod_kaydısil_ctx_slot():
+        selIdxs = self.tableview.selectionModel().selectedIndexes()
+        selIdx = selIdxs[0]
+        self.uzerine_gui = cest_yenieklesil_gui(self,'kaydısil',rowNo=selIdx.row())
             
     def table_customContextMenu(position):
         selIdxs = self.tableview.selectionModel().selectedIndexes()
@@ -96,6 +108,16 @@ def StokFrameOluştur(self):
                     cmenu.addSeparator()
                 cmenu.addAction(tipkod_yeniekle_ctx)
                 cmenu.addAction(tipkod_sil_ctx)
+                
+            elif self.secilentabloadı == "cest_stok_kodları":
+                if not 'B' in self.yetki: # YETKİ DEĞİŞTİRMEYİ DÜŞÜN (D EKLE MESELA)
+                    return
+                if selIdxs:
+                    cmenu.addAction(cestkod_kaydısil_ctx)
+                    cmenu.addSeparator()
+                cmenu.addAction(cestkod_yeniekle_ctx)
+                cmenu.addAction(cestkod_sil_ctx)
+                
             
         action = cmenu.exec_(self.tableview.mapToGlobal(position))
         #print(__name__,"action:",action)
@@ -131,6 +153,15 @@ def StokFrameOluştur(self):
         
         tipkod_sil_ctx = QAction('Kayıt Sil',self)
         tipkod_sil_ctx.triggered.connect(tipkod_sil_ctx_slot)
+        
+        cestkod_yeniekle_ctx = QAction('Yeni Kayıt Ekle',self)
+        cestkod_yeniekle_ctx.triggered.connect(cestkod_yeniekle_ctx_slot)
+        
+        cestkod_sil_ctx = QAction('Kayıt Sil',self)
+        cestkod_sil_ctx.triggered.connect(cestkod_sil_ctx_slot)
+        
+        cestkod_kaydısil_ctx = QAction('Bu Kaydı Sil',self)
+        cestkod_kaydısil_ctx.triggered.connect(cestkod_kaydısil_ctx_slot)
         
         self.tableview.setContextMenuPolicy(Qt.CustomContextMenu)
         self.tableview.customContextMenuRequested.connect(table_customContextMenu)
@@ -174,7 +205,7 @@ def filterBoxYap(self):
     #self.filterbox.setMinimumHeight(100)
     self.filterbox.filterFields = ('Tipi','Tip_Kodu','Boyutlar','Stok_Bölgesi',
                                    'stok_bölgesi_kodu','tip_kodu_adı',
-                                   'Firma_Adı','Ad_Soyad')
+                                   'Firma_Adı','Ad_Soyad','Tip_Adı','Cest_Stok_Kodu')
     self.filterbox.fblo = QGridLayout()
     self.filterbox.setLayout(self.filterbox.fblo)
 #     for i in range(3):

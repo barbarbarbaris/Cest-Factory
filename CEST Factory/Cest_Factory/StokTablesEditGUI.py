@@ -68,7 +68,7 @@ class TipStokKodlarıView(QDialog):
 
     def dialogUIoluştur(self):
         
-        self.setGeometry(100,100,600,500)
+        self.setGeometry(100,100,400,300)
         self.setModal(True)
         
         self.setWindowTitle(self.windowTitleText)
