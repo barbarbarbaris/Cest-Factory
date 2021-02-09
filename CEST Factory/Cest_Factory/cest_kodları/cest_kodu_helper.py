@@ -50,7 +50,6 @@ class cest_kodları_record():
                "FROM cest_stok_kodları WHERE " +
                "Cest_Stok_Kodu " + fieldSQLcondition(self.Cest_Stok_Kodu) + ";"
                )
-        print("checkformatchingCestKodurecord:::::::::::",cmd)
         msg = self.anapencere.stok_dbm.executeCmd(cmd)
         print(msg)
         if len(msg)>1:

@@ -75,7 +75,7 @@ class barisTableViewModel(QAbstractTableModel):
             return 0
         if not self.sqlheader:
             return 0
-        return len(self.sqlheader)
+        return len(self.sqlheader)-1
     
     #https://stackoverflow.com/questions/19411101/pyside-qtableview-example
     
@@ -91,7 +91,7 @@ class barisTableViewModel(QAbstractTableModel):
             #columnname=
             #print("COLUMN NAME İSTENDİ, verilen:",columnname, "tip:",columnname.__class__)
             #print("---- HEADER :",self.sqlheader[section][0])
-            return self.sqlheader[section][0]
+            return self.sqlheader[section+1][0]
         return
 
     
@@ -119,7 +119,7 @@ class barisTableViewModel(QAbstractTableModel):
         #print("Data:***:",data, "** Tip ** :", data.__class__)
 #         return data
         #print("** DATA :",self.sqldata[row][col])
-            return self.sqldata[row][col]
+            return self.sqldata[row][col+1]
         elif role == Qt.BackgroundRole:
             row = index.row()
             if row == self.yellowrow:

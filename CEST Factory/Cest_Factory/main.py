@@ -17,8 +17,8 @@ class anaPencere(QMainWindow):
     def __init__(self):
         super().__init__()
         self.anaPencereAyarla()
-#         self.doAuthentication()
-        self.dontAuthentication()
+        self.doAuthentication()
+#         self.dontAuthentication()
         ui_oluştur(self)
         self.show()
         
@@ -40,7 +40,7 @@ class anaPencere(QMainWindow):
     
     def dbmanagerile_userAuthentication(self):        
         self.stok_dbm = barDBManager("cest_stok")
-        result = self.stok_dbm.connect("admin", "admin", "localhost")
+        result = self.stok_dbm.connect("admin", "admin", "192.168.1.14")
         if result == -1:
             QMessageBox.information(self,"Uyarı",
                                 "Database server bağlantı hatası",
